@@ -114,7 +114,9 @@ class Podbot {
 			return;
 		}
 
-		let podcastName = `${member.voiceChannelID}-${Date.now()}`;
+		// let podcastName = `${member.voiceChannelID}-${Date.now()}`;
+		let podcastName = `${(new Date()).myDateStr()}-${member.voiceChannelID}`;
+
 		Podbot._makeDirectory(path.join(this.podcastsPath, podcastName));
 		console.log('podcastName:', podcastName)
 
@@ -201,5 +203,22 @@ process.on('uncaughtException', (err) => {
 	let errmsg = (err ? err.stack || err : '').toString().replace(new RegExp(`${__dirname}/`, 'g'), './');
   	console.error(errmsg);
 });
+
+Date.prototype.myDateStr = function() {
+	var mm = this.getMonth() + 1; // getMonth() is zero-based
+	var dd = this.getDate();
+	var hr = this.getHours();
+	var mn = this.getMinutes();
+	var sc = this.getSeconds();
+
+	return [
+		this.getFullYear(),
+		(mm>9 ? '' : '0') + mm,
+		(dd>9 ? '' : '0') + dd,
+		(hr>9 ? '' : '0') + hr,
+		(mn>9 ? '' : '0') + mn,
+		(sc>9 ? '' : '0') + sc,
+	].join('_');
+};
 
 const podbot = new Podbot(TOKEN);
