@@ -14,6 +14,12 @@ let extractUserId = (name) => {
 
 let extractTimestamp = (name) => {
 	return parseInt(name.split('-')[1], 10);
+}
+
+let extractNameTimestamp = (name) => {
+	var parts = name.split("-")[0].split('_');
+	var d = new Date(parts[0] + "/" + parts[1] + "/" + parts[2] + " " + parts[3] + ":" + parts[4] + ":" + parts[5]);
+	return d.getTime()
 };
 
 let parseTimeIntoMilliseconds = (timeString) => {
@@ -217,7 +223,7 @@ let assembleUsers = (inputDirectory) => {
 let inputDirectory = path.join('podcasts', process.argv[2]);
 let podcastName = inputDirectory.split(path.sep);
 podcastName = podcastName[podcastName.length - 1];
-let podcastTimestamp = extractTimestamp(podcastName);
+let podcastTimestamp = extractNameTimestamp(podcastName);
 
 // Define global users object
 let users = {};
