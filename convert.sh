@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 for d in `find podcasts -type d -maxdepth 1 -mindepth 1 | cut -d / -f 2`
 do
     if [ ! -f ./podcasts/$d/out.wav ]; then
