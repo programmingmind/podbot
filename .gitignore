@@ -5,3 +5,5 @@ token - podbot
 token - testbot
 podcasts/*
 /controllers
+.DS_Store
+package-lock.json

@@ -93,6 +93,16 @@ class Podbot {
 		}
 	}
 
+	onActivity() {
+		if (this.lastActivityTimeout) {
+			clearTimeout(this.lastActivityTimeout)
+			this.lastActivityTimeout = null
+		}
+		this.lastActivityTimeout = setTimeout(() => {
+			console.warn(Date.now() + ' : More than 30 seconds since audio activity')
+		}, 30*1000)
+	}
+
 	_podon(member) {
 		if (!member) {
 			return;
@@ -106,11 +116,14 @@ class Podbot {
 
 		let podcastName = `${member.voiceChannelID}-${Date.now()}`;
 		Podbot._makeDirectory(path.join(this.podcastsPath, podcastName));
+		console.log('podcastName:', podcastName)
 
+		this.onActivity()
 		member.voiceChannel.join().then((voiceConnection) => {
 			this._voiceConnections.set(member.voiceChannelID, voiceConnection);
 			let voiceReceiver = voiceConnection.createReceiver();
 			voiceReceiver.on('opus', (user, data) => {
+				this.onActivity()
 				let hexString = data.toString('hex');
 				let writeStream = this._writeStreams.get(user.id);
 				if (!writeStream) {
@@ -133,6 +146,9 @@ class Podbot {
 				writeStream.write(`,${hexString}`);
 			});
 			this._voiceReceivers.set(member.voiceChannelID, voiceReceiver);
+			voiceConnection.interval = setInterval(() => {
+				voiceConnection.playFile("./silence.wav")
+			}, 60*1000);
 		}).catch(console.error);
 	}
 
@@ -148,11 +164,15 @@ class Podbot {
 			this._voiceReceivers.get(member.voiceChannelID).destroy();
 			this._voiceReceivers.delete(member.voiceChannelID);
 			this._voiceConnections.get(member.voiceChannelID).disconnect();
+			if (this._voiceConnections.get(member.voiceChannelID).interval) {
+				clearInterval(this._voiceConnections.get(member.voiceChannelID).interval)
+			}
 			this._voiceConnections.delete(member.voiceChannelID);
 		}
 	}
 
 	_checkMemberHasPermissions(member) {
+	    return true;
 		if (this._controllerUsers.has(member.user)) {
 			return true;
 		}
