@@ -163,6 +163,9 @@ let doCommand = (command) => {
 
 let assembleUsers = (inputDirectory) => {
 	fs.readdir(inputDirectory, async(err, files) => {
+		if (err){
+			throw err;
+		}
 		files.forEach((file) => {
 			let ext = path.extname(file);
 			if (ext === '.raw_pcm') {
